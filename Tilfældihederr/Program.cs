@@ -9,6 +9,7 @@ namespace Tilfældighedstest
     {
         static void Main(string[] args)
         {
+            // Random numbers
             List<int> randomNumbers = new List<int>();
             List<int> rngNumbers = new List<int>();
 
@@ -28,14 +29,24 @@ namespace Tilfældighedstest
             Console.WriteLine("Benchmarking Random vs RandomNumberGenerator");
             RunBenchmark(RandomTest, nameof(RandomTest));
             RunBenchmark(RandomNumberGeneratorCreateTest, nameof(RandomNumberGeneratorCreateTest));
+            
 
-            string originalText = "Hello, my name is Simon";
+            // Encryption
+            string originalText = "Hello";
             string encryptedText = Encrypter.Encrypt(originalText);
             string decryptedText = Encrypter.Decrypt(encryptedText);
 
             Console.WriteLine($"Original text: {originalText}");
             Console.WriteLine($"Encrypted text: {encryptedText}");
             Console.WriteLine($"Decrypted text: {decryptedText}");
+
+
+            // Randomness
+            int numberOfTests = 10;
+            int arraySize = 4;
+
+            TestRandomnessWithRNGCryptoServiceProvider(numberOfTests, arraySize);
+            TestRandomnessWithRandom(numberOfTests, arraySize);
 
 
             Console.ReadLine();
@@ -73,6 +84,39 @@ namespace Tilfældighedstest
             long endTime = DateTime.Now.Ticks;
             long elapsedTime = endTime - startTime;
             Console.WriteLine($"{methodName} time (ticks): {elapsedTime}");
+        }
+
+        // Randomness method
+        private static void TestRandomnessWithRNGCryptoServiceProvider(int numberOfTests, int arraySize)
+        {
+            Console.WriteLine("RNGCryptoServiceProvider tilfældighedstest:");
+
+            for (int i = 0; i < numberOfTests; i++)
+            {
+                byte[] randomBytes = new byte[arraySize];
+                using (var randomNumberGenerator = RandomNumberGenerator.Create())
+                {
+                    randomNumberGenerator.GetBytes(randomBytes);
+                }
+
+                int randomInt = BitConverter.ToInt32(randomBytes, 0);
+                Console.WriteLine($"Test {i + 1}: {BitConverter.ToString(randomBytes).Replace("-", "")} => {randomInt}");
+            }
+        }
+        // Randomness method
+        private static void TestRandomnessWithRandom(int numberOfTests, int arraySize)
+        {
+            Console.WriteLine("Random tilfældighedstest:");
+
+            Random random = new Random();
+            for (int i = 0; i < numberOfTests; i++)
+            {
+                byte[] randomBytes = new byte[arraySize];
+                random.NextBytes(randomBytes);
+
+                int randomInt = BitConverter.ToInt32(randomBytes, 0);
+                Console.WriteLine($"Test {i + 1}: {BitConverter.ToString(randomBytes).Replace("-", "")} => {randomInt}");
+            }
         }
     }
 }
